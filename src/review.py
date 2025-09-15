@@ -14,7 +14,7 @@ def review(config):
         provider_data = config_data['providerData']
 
         status = _get_status_by_jira(
-            basic_token=_get_by_config_or_enviroment(provider_data, 'jiraToken', 'JIRA_TOKEN'), 
+            basic_token=_get_by_config_or_enviroment(provider_data, 'jiraToken', 'JIRA_API_TOKEN'), 
             base_url=provider_data['jiraUrl'], 
             board_id=provider_data['boardId'], 
             branch_name=branch_name
