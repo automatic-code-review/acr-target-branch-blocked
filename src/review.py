@@ -1,4 +1,5 @@
 import automatic_code_review_commons as commons
+import re
 import requests
 import os
 
@@ -72,7 +73,9 @@ def _get_status_by_jira(
     board_id: int,
     branch_name: str
 ) -> any:
-    jql = f'summary ~ "{branch_name}" ORDER BY updated DESC',
+    branch_for_jql = re.sub(r'[-/]+', ' ', branch_name).strip()
+
+    jql = f'summary ~ "{branch_for_jql}" ORDER BY updated DESC'
     url = f"{base_url.rstrip('/')}/rest/agile/1.0/board/{board_id}/issue"
     headers = {
         "Authorization": f"Basic {basic_token}",
@@ -95,6 +98,7 @@ def _get_status_by_jira(
             return fields['status']['name']
     
     return ""
+
 
 def _get_by_config_or_enviroment(obj, obj_key, enviroment_key):
     if obj_key in obj:
