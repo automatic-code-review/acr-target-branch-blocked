@@ -75,27 +75,31 @@ def _get_status_by_jira(
 ) -> any:
     branch_for_jql = re.sub(r'[-/]+', ' ', branch_name).strip()
 
-    jql = f'summary ~ "{branch_for_jql}" ORDER BY updated DESC'
-    url = f"{base_url.rstrip('/')}/rest/agile/1.0/board/{board_id}/issue"
     headers = {
         "Authorization": f"Basic {basic_token}",
         "Accept": "application/json",
     }
-    params = {
-        "jql": jql,
-        "fields": "status,summary",
-    }
 
-    resp = requests.get(url, headers=headers, params=params, timeout=30)
-    resp.raise_for_status()
+    for compare in [branch_for_jql, branch_name]:
+        jql = f'summary ~ "{compare}" ORDER BY updated DESC'
+        print(f"acr-target-branch-blocked Efetuando busca no jira [JQL] {jql}")
 
-    objs = resp.json()
+        url = f"{base_url.rstrip('/')}/rest/agile/1.0/board/{board_id}/issue"
+        params = {
+            "jql": jql,
+            "fields": "status,summary",
+        }
 
-    for obj in objs['issues']:
-        fields = obj['fields']
+        resp = requests.get(url, headers=headers, params=params, timeout=30)
+        resp.raise_for_status()
 
-        if fields['summary'] == branch_name:
-            return fields['status']['name']
+        objs = resp.json()
+
+        for obj in objs['issues']:
+            fields = obj['fields']
+
+            if fields['summary'] == branch_name:
+                return fields['status']['name']
     
     return ""
 
